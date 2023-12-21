@@ -7,6 +7,7 @@ const {
   addContact,
   updateContact,
 } = require('../../models/contacts');
+const { validateContact } = require('../../validation');
 
 router.get('/', async (req, res, next) => {
   const contacts = await listContacts();
@@ -24,7 +25,7 @@ router.get('/:contactId', async (req, res, next) => {
   }
 });
 
-router.post('/', async (req, res, next) => {
+router.post('/', validateContact, async (req, res, next) => {
   const { body } = req;
   try {
     const newContact = await addContact(body);
