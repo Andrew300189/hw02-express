@@ -1,11 +1,12 @@
 const { listContacts, getContactById, removeContact, addContact, updateContact } = require('../models/contacts');
+const HttpError = require("./HttpError");
 
 const getContacts = async (req, res, next) => {
   try {
     const contacts = await listContacts();
     res.json(contacts);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error)
   }
 };
 
@@ -14,13 +15,11 @@ const getContact = async (req, res, next) => {
     const { contactId } = req.params;
     const contact = await getContactById(contactId);
 
-    if (contact) {
+    if (!contact) {
+      throw HttpError(404, "Not Found")}
       res.json(contact);
-    } else {
-      res.status(404).json({ message: 'Not found' });
-    }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error)
   }
 };
 
@@ -42,10 +41,10 @@ const deleteContact = async (req, res, next) => {
     if (result) {
       res.json({ message: 'contact deleted' });
     } else {
-      res.status(404).json({ message: 'Not found' });
+      throw HttpError(404, "Not Found");
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error)
   }
 };
 
@@ -55,13 +54,11 @@ const updateContactInfo = async (req, res, next) => {
     const { body } = req;
     const updatedContact = await updateContact(contactId, body);
 
-    if (updatedContact) {
+    if (!updatedContact) {
+      throw HttpError(404, "Not Found")}
       res.json(updatedContact);
-    } else {
-      res.status(404).json({ message: 'Not found' });
-    }
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    next(error)
   }
 };
 
