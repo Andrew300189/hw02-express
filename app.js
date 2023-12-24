@@ -1,6 +1,9 @@
+// app.js
+
 const express = require('express');
 const logger = require('morgan');
 const cors = require('cors');
+const mongoose = require('mongoose');
 const contactsRouter = require('./routes/api/contacts');
 
 const app = express();
@@ -18,8 +21,8 @@ app.use((req, res) => {
 });
 
 app.use((err, req, res, next) => {
-  const {status = 500, message = "Server error" } = err;
-  res.status(status).json({ message, });
+  const { status = 500, message = 'Server error' } = err;
+  res.status(status).json({ message });
 });
 
 module.exports = app;
