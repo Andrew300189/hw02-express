@@ -1,30 +1,23 @@
-const { Contact } = require('../models/contact');
+const { Contact } = require('../models/contacts');
 const { contactSchema } = require('../validators/contactValidator');
-const HttpError = require('./HttpError');
+const HttpError = require("./HttpError");
 const ctrlWrapper = require('./ctrlWrapper');
 
 const getContacts = async (req, res) => {
-  try {
+
     const contacts = await Contact.find();
     res.json(contacts);
-  } catch (error) {
-    res.status(500).json({ message: 'Internal Server Error' });
-  }
+  
 };
 
 const getContact = async (req, res) => {
-  try {
     const { contactId } = req.params;
     const contact = await Contact.findById(contactId);
 
     if (!contact) {
-      throw HttpError(404, 'Not Found');
-    }
-
-    res.json(contact);
-  } catch (error) {
-    res.status(500).json({ message: 'Internal Server Error' });
-  }
+      throw HttpError(404, 'Not Found')}
+      res.json(contact);
+  
 };
 
 const createContact = async (req, res) => {
@@ -33,44 +26,39 @@ const createContact = async (req, res) => {
     const newContact = await Contact.create(body);
     res.status(201).json(newContact);
   } catch (error) {
-    res.status(400).json({ message: 'Bad Request' });
+    res.status(400).json({ message: 'missing required name field' });
   }
 };
 
 const deleteContact = async (req, res) => {
-  try {
     const { contactId } = req.params;
     const result = await Contact.findByIdAndRemove(contactId);
 
     if (result) {
-      res.json({ message: 'Contact deleted' });
+      res.json({ message: 'contact deleted' });
     } else {
       throw HttpError(404, 'Not Found');
     }
-  } catch (error) {
-    res.status(500).json({ message: 'Internal Server Error' });
-  }
+   
 };
 
 const updateContactInfo = async (req, res) => {
-  try {
+  
     const { error } = contactSchema.validate(req.body);
 
     if (error) {
-      throw HttpError(400, 'Bad Request');
+      throw HttpError(400, 'missing fields');
     }
 
     const { contactId } = req.params;
-    const updatedContact = await Contact.findByIdAndUpdate(contactId, req.body, { new: true });
+    const updatedContact = await Contact.findByIdAndUpdate(contactId, req.body);
 
     if (!updatedContact) {
       throw HttpError(404, 'Not Found');
     }
 
     res.json(updatedContact);
-  } catch (error) {
-    res.status(500).json({ message: 'Internal Server Error' });
-  }
+  
 };
 
 module.exports = {
