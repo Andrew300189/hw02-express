@@ -1,4 +1,4 @@
-const { Contact } = require('../models/contacts');
+const { Contact } = require('../models/contact');
 const { contactSchema } = require('../validators/contactValidator');
 const HttpError = require("./HttpError");
 const ctrlWrapper = require('./ctrlWrapper');
@@ -61,10 +61,25 @@ const updateContactInfo = async (req, res) => {
   
 };
 
+const updateFavorite = async (req, res) => {
+  
+  const { contactId } = req.params;
+  
+  const updatedContact = await Contact.findByIdAndUpdate(contactId, req.body, {new: true});
+
+  if (!updatedContact) {
+    throw HttpError(404, 'Not Found');
+  }
+
+  res.json(updatedContact);
+
+}
+
 module.exports = {
   getContacts: ctrlWrapper(getContacts),
   getContact: ctrlWrapper(getContact),
   createContact,
   deleteContact: ctrlWrapper(deleteContact),
   updateContactInfo: ctrlWrapper(updateContactInfo),
+  updateFavorite: ctrlWrapper(updateFavorite),
 };

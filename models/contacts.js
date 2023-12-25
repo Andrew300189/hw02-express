@@ -1,55 +1,36 @@
-const fs = require('fs/promises');
-
-const contactsPath = './models/contacts.json';
+const { HttpError } = require('../controllers');
+const Contact = require('../models/contact');
 
 const listContacts = async () => {
-  const data = await fs.readFile(contactsPath, 'utf-8');
-  return JSON.parse(data);
+  return await Contact.find({});
 };
 
 const getContactById = async (contactId) => {
-  const contacts = await listContacts();
-  return contacts.find((contact) => contact.id === contactId);
+  return await Contact.findOne(contactId);
 };
 
 const removeContact = async (contactId) => {
-  const contacts = await listContacts();
-  const updatedContacts = contacts.filter((contact) => contact.id !== contactId);
-
-  if (contacts.length === updatedContacts.length) {
-    return false;
-  }
-
-  await fs.writeFile(contactsPath, JSON.stringify(updatedContacts, null, 2));
-  return true;
+  const result = await Contact.findByIdAndRemove(contactId);
+  return result !== null;
 };
 
 const addContact = async (body) => {
-  const contacts = await listContacts();
-  const newContact = { id: Date.now().toString(), ...body };
-  contacts.push(newContact);
-  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
-  return newContact;
+  return await Contact.create(body);
 };
 
 const updateContact = async (contactId, body) => {
-  const contacts = await listContacts();
-  const index = contacts.findIndex((contact) => contact.id === contactId);
-
-  if (index === -1) {
-    return null;
-  }
-
-  contacts[index] = { ...contacts[index], ...body };
-  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
-
-  return contacts[index];
+  const updatedContact = await Contact.findByIdAndUpdate(contactId, body, { new: true });
+  return updatedContact;
 };
-
+const updateFavorite = async (contactId, body) => {
+  const updatedContact = await Contact.findByIdAndUpdate(contactId, body, { new: true });
+  return updatedContact;
+};
 module.exports = {
   listContacts,
   getContactById,
   removeContact,
   addContact,
   updateContact,
+  updateFavorite
 };
