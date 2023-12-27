@@ -39,6 +39,14 @@ const updateById = async (req, res) => {
   }
   res.json(result);
 }
+const updateFavorite = async (req, res) => {
+  const { id } = req.params;
+  const result = await Contact.findByIdAndUpdate(id, req.body, {new: true});
+  if (!result) {
+      throw HttpError(404, "Not found");
+  }
+  res.json(result);
+}
 
 const deleteById = async (req, res) => {
   const { id } = req.params;
@@ -54,5 +62,6 @@ module.exports = {
   getById: ctrlWrapper(getById),
   add: ctrlWrapper(add),
   updateById: ctrlWrapper(updateById),
+  updateFavorite: ctrlWrapper(updateFavorite),
   deleteById: ctrlWrapper(deleteById),
 }
