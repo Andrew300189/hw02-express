@@ -1,40 +1,59 @@
-const { Schema, model } = require('mongoose');
-const {handleMongooseError} = require('../controllers')
-const Joi = require('joi');
+const {Schema, model} = require("mongoose");
+const Joi = require("joi");
 
-const monContactSchema = new Schema(
-  {
-    name: {
-      type: String,
-      required: true,
+const {handleMongooseError} = require("../helpers");
+
+const genreList = ["fantastic", "love"];
+const dateRegexp = /^\d{2}-\d{2}-\d{4}$/;
+
+const contactSchema = new Schema({
+    title: {
+        type: String,
+        required: true,
     },
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-    phone: {
-      type: String,
-      required: true,
+    author: {
+        type: String,
+        required: true,
     },
     favorite: {
-      type: Boolean,
-      default: false,
+        type: Boolean,
+        default: false,
     },
-  },
-  { versionKey: false, timestamps: true }
-);
+    genre: {
+        type: String,
+        enum: genreList,
+        required: true,
+    },
+    date: {
+        type: String,
+        // 16-10-2009
+        match: dateRegexp,
+        required: true,
+   }
+}, {versionKey: false, timestamps: true});
 
-monContactSchema.post('save', handleMongooseError);
+contactSchema.post("save", handleMongooseError);
 
-const contactSchema = Joi.object({
-  name: Joi.string().required(),
-  email: Joi.string().email().required(),
-  phone: Joi.string().required(),
-  favorite: Joi.boolean(),
+const addSchema = Joi.object({
+    title: Joi.string().required(),
+    author: Joi.string().required(),
+    favorite: Joi.boolean(),
+    genre: Joi.string().valid(...genreList).required(),
+    date: Joi.string().pattern(dateRegexp).required(),
 });
 
+const updateFavoriteSchema = Joi.object({
+    favorite: Joi.boolean().required(),
+})
 
-const Contact = model('Contact', monContactSchema);
+const schemas = {
+    addSchema,
+    updateFavoriteSchema,
+}
 
-module.exports = {Contact, monContactSchema, contactSchema};
+const Contact = model("contact", contactSchema);
+
+module.exports = {
+    Contact,
+    schemas,
+}
