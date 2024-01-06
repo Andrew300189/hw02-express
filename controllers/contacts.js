@@ -10,8 +10,12 @@ const getAll = async (req, res) => {
 };
 
 const getById = async (req, res) => {
+  const {_id} = req.user;
   const { id } = req.params;
-  const result = await Contact.findById(id);
+  const result = await Contact.findById({
+    _id: id,
+    owner: _id
+  }).populate('owner', '_id subscription email');
   if (!result) {
     throw HttpError(404, "contact not found");
   }
