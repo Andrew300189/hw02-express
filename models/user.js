@@ -1,5 +1,6 @@
 const {Schema, model} = require("mongoose");
 const Joi = require("joi");
+const gravatar = require("gravatar");
 
 const {handleMongooseError} = require("../helpers");
 
@@ -23,10 +24,22 @@ const userSchema = new Schema({
       token: {
         type: String,
         default: null,
-    }
+    },
+      avatarURL: {
+      type: String,
+      minlength: 6,
+      required: true,
+  }
 }, {versionKey: false, timestamps: true});
 
 userSchema.post("save", handleMongooseError);
+
+userSchema.pre('save', function (next) {
+  if (!this.avatarURL) {
+    this.avatarURL = gravatar.url(this.email, { s: '250', r: 'pg', d: 'identicon' }, true);
+  }
+  next();
+});
 
 const registerSchema = Joi.object({
 
