@@ -78,6 +78,12 @@ const logout = async(req, res) => {
 
 const updateAvatar = async(req, res)=> {
     const {_id} = req.user;
+    console.log(req.file)
+
+    if (!req.file) {
+        return res.status(400).send('File isn\'t attached')
+    }
+
     const {path: tempUpload, originalname} = req.file;
     const filename = `${_id}_${originalname}`;
     const resultUpload = path.join(avatarsDir, filename);
